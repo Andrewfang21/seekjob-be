@@ -1,24 +1,21 @@
 package models
 
 import (
-	"time"
-
 	"github.com/jinzhu/gorm"
 )
 
 // Job model
 type Job struct {
-	ID          int        `json:"id" gorm:"column:id"`
-	URL         string     `json:"url" gorm:"column:url"`
-	Title       string     `json:"title" gorm:"column:title"`
-	Company     string     `json:"company" gorm:"column:company"`
-	Description string     `json:"description" gorm:"column:description"`
-	Category    string     `json:"category" gorm:"column:category"`
-	Locations   []string   `json:"locations"`
-	Country     string     `json:"country" gorm:"column:country"`
-	Type        string     `json:"type" gorm:"column:type"`
-	PostedAt    *time.Time `json:"time" gorm:"column:time"`
-	Source      string     `json:"source" gorm:"column:source"`
+	ID          string `json:"id" gorm:"column:id"`
+	URL         string `json:"url" gorm:"column:url"`
+	Title       string `json:"title" gorm:"column:title"`
+	Company     string `json:"company" gorm:"column:company"`
+	Description string `json:"description" gorm:"column:description"`
+	Category    string `json:"category" gorm:"column:category"`
+	Country     string `json:"country" gorm:"column:country"`
+	Type        string `json:"type" gorm:"column:type"`
+	PostedAt    int64  `json:"time" gorm:"column:time"`
+	Source      string `json:"source" gorm:"column:source"`
 }
 
 // JobOrmer defines the operations of jobOrmer

@@ -1,8 +1,11 @@
 package github
 
-import "fmt"
+import (
+	"seekjob/utils"
+	"strconv"
+)
 
-const API_BASE_URL string = "https://jobs.github.com/positions.json"
+const API_BASE_URL = "https://jobs.github.com/positions.json"
 
 type githubJobsRequestable interface {
 	constructEndpoints() string
@@ -13,17 +16,19 @@ type githubJobsRequest struct {
 	country     string
 }
 
-func NewGithubJobsRequest(currentPage int, country string) githubJobsRequestable {
+func newGithubJobsRequest(currentPage int, country string) githubJobsRequestable {
 	return &githubJobsRequest{
 		currentPage: currentPage,
 		country:     country,
 	}
 }
 
+/*
+	Params: @optional location
+	By default, Github Jobs API returns at most 50 results per page
+*/
 func (g *githubJobsRequest) constructEndpoints() string {
-	apiEndpoint := fmt.Sprintf("%s?location=%s&page=%d",
-		API_BASE_URL,
-		g.country, g.currentPage,
-	)
-	return apiEndpoint
+	pageInString := strconv.Itoa(g.currentPage)
+	endpoint := API_BASE_URL + "?" + utils.ConstructAPIQuery("location", g.country, "page", pageInString)
+	return endpoint
 }

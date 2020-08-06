@@ -1,7 +1,7 @@
 package scrapers
 
 import (
-	"fmt"
+	"runtime"
 	"seekjob/scrapers/adzuna"
 	"seekjob/scrapers/github"
 	"seekjob/scrapers/remotive"
@@ -13,15 +13,16 @@ type scraper struct {
 	remotiveScraper  remotive.Handler
 }
 
-type scraperable interface {
+// Scraper defines the operations of scraper
+type Scraper interface {
 	ScrapeJobs()
 }
 
+// NewScraperHandler returns handler for all jobs API
 func NewScraperHandler(
 	adzunaScraper adzuna.Handler,
 	githubJobsScaper github.Handler,
-	remotiveScraper remotive.Handler,
-) scraperable {
+	remotiveScraper remotive.Handler) Scraper {
 	return &scraper{
 		adzunaScraper:    adzunaScraper,
 		githubJobScraper: githubJobsScaper,
@@ -30,5 +31,9 @@ func NewScraperHandler(
 }
 
 func (s *scraper) ScrapeJobs() {
-	fmt.Println("Inside ScrapeJobs() in base_scraper.go")
+	runtime.GOMAXPROCS(3)
+
+	// go s.adzunaScraper.ScrapeJobs()
+	// go s.githubJobScraper.ScrapeJobs()
+	go s.remotiveScraper.ScrapeJobs()
 }

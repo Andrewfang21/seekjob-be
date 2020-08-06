@@ -1,25 +1,30 @@
 package remotive
 
-import "fmt"
+import (
+	"seekjob/utils"
+)
 
-const API_BASE_URL string = "https://remotive.io/api"
+const API_BASE_URL = "https://remotive.io/api"
 
 type remotiveRequestable interface {
 	constructEndpoints() string
 }
 
 type remotiveRequest struct {
-	tag string
+	category string
 }
 
-func NewRemotiveRequest(tag string) remotiveRequestable {
-	return &remotiveRequest{tag: tag}
+func newRemotiveRequest(category string) remotiveRequestable {
+	return &remotiveRequest{category: category}
 }
 
+/*
+	Params: @required category
+*/
 func (r *remotiveRequest) constructEndpoints() string {
-	apiEndpoint := fmt.Sprintf("%s/remote-jobs?category=%s",
-		API_BASE_URL,
-		r.tag,
-	)
-	return apiEndpoint
+	endpoint :=
+		utils.ConstructAPIPath(API_BASE_URL, "remote-jobs") +
+			"?" +
+			utils.ConstructAPIQuery("category", r.category)
+	return endpoint
 }

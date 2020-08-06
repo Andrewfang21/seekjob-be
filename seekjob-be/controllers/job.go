@@ -12,10 +12,11 @@ import (
 
 // JobController defines the operations of jobController
 type JobController interface {
-	GetJob(*gin.Context)
-	GetJobs(*gin.Context)
-	GetJobsByCategory(*gin.Context)
-	GetJobsByLocation(*gin.Context)
+	GetJob(c *gin.Context)
+	GetJobs(c *gin.Context)
+	GetJobsByCategory(c *gin.Context)
+	GetJobsByLocation(c *gin.Context)
+	GetJobsStatistics(c *gin.Context)
 }
 
 type jobController struct {
@@ -91,5 +92,17 @@ func (j *jobController) GetJobsByCategory(c *gin.Context) {
 func (j *jobController) GetJobsByLocation(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Routed inside GetJobsByLocation()",
+	})
+}
+
+/*
+	Method: [GET]
+	Route: /api/jobs/stats
+	Params: -
+	Returns list of jobs grouped by categories and the job counts
+*/
+func (j *jobController) GetJobsStatistics(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Routed inside GetJobsStatistics()",
 	})
 }

@@ -41,9 +41,11 @@ func main() {
 	c := cron.New()
 	c.AddFunc("@every 0h0m2s", scraper.ScrapeJobs)
 	c.Start()
+	// scraper.ScrapeJobs()
 
 	r.GET("/api/jobs", jobController.GetJobs)
 	r.GET("/api/jobs/id/:id", jobController.GetJob)
+	r.GET("/api/job/stats", jobController.GetJobsStatistics)
 	r.GET("/api/jobs/category/:category", jobController.GetJobsByCategory)
 	r.GET("/api/jobs/location/:location", jobController.GetJobsByLocation)
 
