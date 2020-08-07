@@ -11,7 +11,10 @@ var ScraperCfg scraperConfig
 type scraperConfig struct {
 	Adzuna     AdzunaScraperCfg     `mapstructure:"adzuna"`
 	GithubJobs GithubJobsScraperCfg `mapstructure:"github"`
+	Jooble     JoobleScraperCfg     `mapstructure:"jooble"`
+	Reed       ReedScraperCfg       `mapstructure:"reed"`
 	Remotive   RemotiveScraperCfg   `mapstructure:"remotive"`
+	TheMuse    TheMuseScraperCfg    `mapstructure:"themuse"`
 }
 
 type AdzunaScraperCfg struct {
@@ -21,7 +24,19 @@ type AdzunaScraperCfg struct {
 
 type GithubJobsScraperCfg struct{}
 
+type JoobleScraperCfg struct {
+	ApiKey string `mapstructure:"api_key"`
+}
+
+type ReedScraperCfg struct {
+	ApiKey string `mapstructure:"api_key"`
+}
+
 type RemotiveScraperCfg struct{}
+
+type TheMuseScraperCfg struct {
+	ApiKey string `mapstructure:"api_key"`
+}
 
 func init() {
 	viper.SetConfigFile("scraper_config.yaml")

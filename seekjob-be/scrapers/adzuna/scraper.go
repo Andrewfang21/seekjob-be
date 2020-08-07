@@ -3,9 +3,7 @@ package adzuna
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
 	"seekjob/config"
 	"seekjob/models"
 	"seekjob/utils"
@@ -55,7 +53,6 @@ func (h *handler) ScrapeJobs() {
 						log.Printf("[ERROR] Error upsert job in Adzuna %+v: %s", job, err)
 						continue
 					}
-					fmt.Printf("%+v\n", job)
 				}
 			}
 		}
@@ -64,20 +61,9 @@ func (h *handler) ScrapeJobs() {
 
 func (h *handler) getJobs(category, country string, currentPage int) ([]models.Job, error) {
 	r := newAdzunaRequest(h.adzunaScraperCfg, currentPage, country, category)
-	endpoints := r.constructEndpoints()
-	log.Println(endpoints)
-
-	resp, err := http.Get(endpoints)
+	body, err := r.callEndpoint("GET")
 	if err != nil {
-		return nil, fmt.Errorf("[ERROR] Error scraping Adzuna with category=%s country=%s page=%d: %s",
-			category, country, currentPage, err,
-		)
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("[ERROR] Error reading response body: %s", err)
+		return nil, err
 	}
 
 	res := &adzunaResponse{}

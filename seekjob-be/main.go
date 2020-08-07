@@ -13,10 +13,10 @@ import (
 	"seekjob/scrapers"
 	"seekjob/scrapers/adzuna"
 	"seekjob/scrapers/github"
+	"seekjob/scrapers/reed"
 	"seekjob/scrapers/remotive"
 
 	"github.com/gin-gonic/gin"
-	"github.com/robfig/cron/v3"
 )
 
 func main() {
@@ -35,17 +35,23 @@ func main() {
 	scraperCfg := config.ScraperCfg
 	adzunaScraper := adzuna.NewAdzunaScraperHandler(jobOrmer, scraperCfg.Adzuna)
 	githubJobsScraper := github.NewGithubJobsScraperHandler(jobOrmer)
+	reedScraper := reed.NewReedScraperHandler(jobOrmer, scraperCfg.Reed)
 	remotiveScraper := remotive.NewRemotiveScraperHandler(jobOrmer)
-	scraper := scrapers.NewScraperHandler(adzunaScraper, githubJobsScraper, remotiveScraper)
+	scraper := scrapers.NewScraperHandler(
+		adzunaScraper,
+		githubJobsScraper,
+		reedScraper,
+		remotiveScraper,
+	)
 
-	c := cron.New()
-	c.AddFunc("@every 0h0m2s", scraper.ScrapeJobs)
-	c.Start()
-	// scraper.ScrapeJobs()
+	// c := cron.New()
+	// c.AddFunc("@every 0h0m2s", scraper.ScrapeJobs)
+	// c.Start()
+	scraper.ScrapeJobs()
 
 	r.GET("/api/jobs", jobController.GetJobs)
 	r.GET("/api/jobs/id/:id", jobController.GetJob)
-	r.GET("/api/job/stats", jobController.GetJobsStatistics)
+	r.GET("/api/jobs/stats", jobController.GetJobsStatistics)
 	r.GET("/api/jobs/category/:category", jobController.GetJobsByCategory)
 	r.GET("/api/jobs/location/:location", jobController.GetJobsByLocation)
 

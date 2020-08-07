@@ -9,6 +9,14 @@ var ADZUNA_CATEGORIES = map[string]string{
 
 var GITHUB_JOBS_CATEGORIES = map[string]string{}
 
+var REED_CATEGORIES = []string{
+	"Accounting",
+	"Marketing",
+	"Project Manager",
+	"Software Developer",
+	"Software Engineering",
+}
+
 var REMOTIVE_JOBS_CATEGORIES = map[string]string{
 	"software-dev":    "Software Development",
 	"marketing-sales": "Marketing / Sales",

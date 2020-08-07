@@ -1,17 +1,21 @@
 package adzuna
 
 import (
+	"fmt"
+	"io/ioutil"
+	"net/http"
 	"seekjob/config"
 	"seekjob/utils"
 	"strconv"
 )
 
-const API_BASE_URL = "https://api.adzuna.com"
-const API_VERSION = "v1"
-const RESULTS_PER_PAGE = "50"
+const API_BASE_URL string = "https://api.adzuna.com"
+const API_VERSION string = "v1"
+const RESULTS_PER_PAGE string = "50"
 
 type adzunaRequestable interface {
-	constructEndpoints() string
+	callEndpoint(method string) ([]byte, error)
+	constructRequestHeaders(req *http.Request)
 }
 
 type adzunaRequest struct {
@@ -36,6 +40,7 @@ func newAdzunaRequest(
 }
 
 /*
+	API DOCS: https://developer.adzuna.com/activedocs#!/adzuna/categories
 	Params: @required app_id
 			@required app_key
 			@required page
@@ -44,12 +49,45 @@ func newAdzunaRequest(
 
 	By default, Adzuna API returns at most 50 results per page
 */
-func (a *adzunaRequest) constructEndpoints() string {
+func (a *adzunaRequest) callEndpoint(method string) ([]byte, error) {
 	pageInString := strconv.Itoa(a.currentPage)
-	endpoint :=
-		utils.ConstructAPIPath(API_BASE_URL, API_VERSION, "api", "jobs", a.country, "search", pageInString) +
-			"?" +
-			utils.ConstructAPIQuery("app_id", a.applicationID, "app_key", a.applicationKey, "category", a.category, "results_per_page", RESULTS_PER_PAGE)
+	path := utils.ConstructUrlPath(
+		API_BASE_URL,
+		API_VERSION,
+		"api", "jobs",
+		a.country,
+		"search",
+		pageInString,
+	)
+	params := map[string]string{
+		"app_id":           a.applicationID,
+		"app_key":          a.applicationKey,
+		"category":         a.category,
+		"results_per_page": RESULTS_PER_PAGE,
+	}
 
-	return endpoint
+	url := utils.ConstructRequestUrl(path, params)
+	req, err := http.NewRequest(method, url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("[ERROR] Error creating NewRequest: %s", err)
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("[ERROR] Error scraping Adzuna with category=%s country=%s page=%d: %s",
+			a.category, a.country, a.currentPage, err,
+		)
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("[ERROR] Error reading response body: %s", err)
+	}
+
+	return body, nil
+}
+func (a *adzunaRequest) constructRequestHeaders(req *http.Request) {
+	req.Header.Set("Content-Type", "application/json")
 }

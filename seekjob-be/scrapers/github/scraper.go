@@ -3,15 +3,13 @@ package github
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
 	"seekjob/models"
 	"seekjob/utils"
 	"time"
 )
 
-// Handler defines operations of scraper handler for Adzuna API
+// Handler defines operations of scraper handler for GithubJobs API
 type Handler interface {
 	ScrapeJobs()
 	getJobsByCountry(country string, currentPage int) ([]models.Job, error)
@@ -32,7 +30,7 @@ func (h *handler) ScrapeJobs() {
 	for _, country := range utils.GITHUB_JOBS_COUNTRIES {
 		// Scrape at most 100 pages
 		for page := 0; page < 100; page++ {
-			jobs, err := h.getJobsByCountry(utils.ConvertStringSpaces(country), page)
+			jobs, err := h.getJobsByCountry(country, page)
 			if err != nil {
 				log.Println(err)
 				continue
@@ -55,20 +53,9 @@ func (h *handler) ScrapeJobs() {
 
 func (h *handler) getJobsByCountry(country string, currentPage int) ([]models.Job, error) {
 	r := newGithubJobsRequest(currentPage, country)
-	endpoints := r.constructEndpoints()
-	log.Println(endpoints)
-
-	resp, err := http.Get(endpoints)
+	body, err := r.callEndpoint("GET")
 	if err != nil {
-		return nil, fmt.Errorf("[ERROR] Error scraping GithubJobs with country=%s page=%d: %s",
-			country, currentPage, err,
-		)
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("[ERROR] Error reading response body: %s", err)
+		return nil, err
 	}
 
 	var results []githubJobsResponse
@@ -92,6 +79,7 @@ func (h *handler) getJobsByCountry(country string, currentPage int) ([]models.Jo
 
 func (h *handler) githubJobAdapter(rawJob githubJobsResponse, country string) models.Job {
 	timestamp, _ := time.Parse("Mon Jan 02 15:04:05 MST 2006", rawJob.PostedAt)
+
 	return models.Job{
 		ID:          rawJob.ID,
 		URL:         rawJob.URL,

@@ -1,40 +1,25 @@
 package utils
 
-import "strings"
+import (
+	"net/url"
+	"strings"
+)
 
-func ConvertStringSpaces(str string) string {
+func encodeQueryParams(str string) string {
 	return strings.ReplaceAll(str, " ", "%20")
 }
 
-func ConstructAPIPath(strings ...string) string {
-	if len(strings) == 0 {
-		return ""
-	}
-
-	ret := ""
-	for i := 0; i < len(strings); i++ {
-		ret += strings[i]
-		if i == len(strings)-1 {
-			break
-		}
-		ret += "/"
-	}
-	return ret
+func ConstructUrlPath(s ...string) string {
+	return strings.Join(s, "/")
 }
 
-func ConstructAPIQuery(strings ...string) string {
-	if len(strings) == 0 {
-		return ""
+func ConstructRequestUrl(path string, params map[string]string) string {
+	reqParams := url.Values{}
+	for k, v := range params {
+		reqParams.Set(k, v)
 	}
+	endpointUrl, _ := url.Parse(path)
+	endpointUrl.RawQuery = encodeQueryParams(reqParams.Encode())
 
-	ret := ""
-	operators := []string{"=", "&"}
-	for i := 0; i < len(strings); i++ {
-		ret += strings[i]
-		if i == len(strings)-1 {
-			break
-		}
-		ret += operators[i%2]
-	}
-	return ret
+	return endpointUrl.String()
 }

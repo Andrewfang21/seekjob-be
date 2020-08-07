@@ -1,12 +1,20 @@
 package utils
 
 var GITHUB_JOBS_COUNTRIES = []string{
-	"Singapore", // As of now, there are no jobs based in Singapore that are listed in GithubJobs
+	"Australia",
+	"Canada",
 	"Indonesia",
 	"India",
+	"Singapore", // As of now, there are no jobs based in Singapore that are listed in GithubJobs
 	"United States of America",
-	"Canada",
+}
+
+var REED_COUNTRIES = []string{
+	"America",
 	"Australia",
+	"Canada",
+	"India",
+	"Singapore",
 }
 
 var ADZUNA_COUNTRIES_CODE_MAP = map[string]string{
@@ -21,6 +29,7 @@ var COUNTRIES_STRING_MAP = map[string]string{
 	"Indonesia":                "IDN",
 	"India":                    "IND",
 	"United States of America": "USA",
+	"America":                  "USA", // To handle Reed API, since Reed API does not support location `United State of America`
 	"Canada":                   "CAN",
 	"Australia":                "AUS",
 	"Remote":                   "REM",

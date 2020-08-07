@@ -3,9 +3,7 @@ package remotive
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
 	"seekjob/models"
 	"seekjob/utils"
 	"strconv"
@@ -30,7 +28,6 @@ func NewRemotiveScraperHandler(jobOrmer models.JobOrmer) Handler {
 
 func (h *handler) ScrapeJobs() {
 	// TODO: Use go routine
-	// By default, Remotive does not support pagination
 	for category := range utils.REMOTIVE_JOBS_CATEGORIES {
 		jobs, err := h.getJobsByCategory(category)
 		if err != nil {
@@ -47,31 +44,19 @@ func (h *handler) ScrapeJobs() {
 				log.Printf("[ERROR] Error upsert job in Remotive %+v: %s", job, err)
 				continue
 			}
-			fmt.Printf("%+v\n", job.PostedAt)
 		}
 	}
 }
 
 func (h *handler) getJobsByCategory(category string) ([]models.Job, error) {
 	r := newRemotiveRequest(category)
-	endpoints := r.constructEndpoints()
-	log.Println(endpoints)
-
-	resp, err := http.Get(endpoints)
+	body, err := r.callEndpoint("GET")
 	if err != nil {
-		return nil, fmt.Errorf("[ERROR] Error scraping Remotive with category=%s: %s",
-			category, err,
-		)
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("[ERROR] Error reading response body: %s", err)
+		return nil, err
 	}
 
-	var results remotiveResponse
-	err = json.Unmarshal(body, &results)
+	results := &remotiveResponse{}
+	err = json.Unmarshal(body, results)
 	if err != nil {
 		return nil, fmt.Errorf("[ERROR] Error unmarshal body: %s", err)
 	}
@@ -92,6 +77,7 @@ func (h *handler) getJobsByCategory(category string) ([]models.Job, error) {
 func (h *handler) remotiveJobAdapter(rawJob remotiveJob) models.Job {
 	idInString := strconv.Itoa(rawJob.ID)
 	timestamp, _ := time.Parse(time.RFC3339, rawJob.PostedAt+"Z")
+
 	return models.Job{
 		ID:          idInString,
 		URL:         rawJob.URL,
