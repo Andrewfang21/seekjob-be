@@ -22,3 +22,12 @@ var REMOTIVE_JOBS_CATEGORIES = map[string]string{
 	"marketing-sales": "Marketing / Sales",
 	"product":         "Product",
 }
+
+var THE_MUSE_JOBS_CATEGORIES = []string{
+	"Business & Strategy",
+	"Data Science",
+	"Engineering",
+	"Finance",
+	"Marketing & PR",
+	"Project & Product Management",
+}

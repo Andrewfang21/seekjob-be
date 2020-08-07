@@ -15,6 +15,7 @@ import (
 	"seekjob/scrapers/github"
 	"seekjob/scrapers/reed"
 	"seekjob/scrapers/remotive"
+	"seekjob/scrapers/themuse"
 
 	"github.com/gin-gonic/gin"
 )
@@ -37,11 +38,13 @@ func main() {
 	githubJobsScraper := github.NewGithubJobsScraperHandler(jobOrmer)
 	reedScraper := reed.NewReedScraperHandler(jobOrmer, scraperCfg.Reed)
 	remotiveScraper := remotive.NewRemotiveScraperHandler(jobOrmer)
+	theMuseScraper := themuse.NewTheMuseScraperHandler(jobOrmer, scraperCfg.TheMuse)
 	scraper := scrapers.NewScraperHandler(
 		adzunaScraper,
 		githubJobsScraper,
 		reedScraper,
 		remotiveScraper,
+		theMuseScraper,
 	)
 
 	// c := cron.New()

@@ -33,6 +33,7 @@ var COUNTRIES_STRING_MAP = map[string]string{
 	"Canada":                   "CAN",
 	"Australia":                "AUS",
 	"Remote":                   "REM",
+	"Flexbile / Remote":        "REM",
 }
 
 var COUNTRIES_ISO_CODE_MAP = map[string]string{

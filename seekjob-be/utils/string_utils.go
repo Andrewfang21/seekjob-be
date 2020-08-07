@@ -6,7 +6,7 @@ import (
 )
 
 func encodeQueryParams(str string) string {
-	return strings.ReplaceAll(str, " ", "%20")
+	return strings.ReplaceAll(str, "+", "%20")
 }
 
 func ConstructUrlPath(s ...string) string {
