@@ -28,7 +28,12 @@ func NewRemotiveScraperHandler(jobOrmer models.JobOrmer) Handler {
 
 func (h *handler) ScrapeJobs() {
 	// TODO: Use go routine
-	for category := range utils.REMOTIVE_JOBS_CATEGORIES {
+	categories, err := utils.GetCategories("REMOTIVE")
+	if err != nil {
+		log.Println(err)
+	}
+
+	for _, category := range categories {
 		jobs, err := h.getJobsByCategory(category)
 		if err != nil {
 			log.Println(err)

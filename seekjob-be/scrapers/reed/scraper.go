@@ -37,8 +37,17 @@ func NewReedScraperHandler(
 
 func (h *handler) ScrapeJobs() {
 	// TODO: Use go routine
-	for _, country := range utils.REED_COUNTRIES {
-		for _, category := range utils.REED_CATEGORIES {
+	countries, err := utils.GetCountries("REED")
+	if err != nil {
+		log.Println(err)
+	}
+	categories, err := utils.GetCategories("REED")
+	if err != nil {
+		log.Println(err)
+	}
+
+	for _, country := range countries {
+		for _, category := range categories {
 			// Scrape at most 100 pages
 			for page := 1; page < 100; page++ {
 				offset := (page - 1) * RESULTS_PER_PAGE

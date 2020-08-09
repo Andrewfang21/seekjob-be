@@ -27,7 +27,11 @@ func NewGithubJobsScraperHandler(jobOrmer models.JobOrmer) Handler {
 
 func (h *handler) ScrapeJobs() {
 	// TODO: Use go routine
-	for _, country := range utils.GITHUB_JOBS_COUNTRIES {
+	countries, err := utils.GetCountries("GITHUB")
+	if err != nil {
+		log.Println(err)
+	}
+	for _, country := range countries {
 		// Scrape at most 100 pages
 		for page := 0; page < 100; page++ {
 			jobs, err := h.getJobsByCountry(country, page)
@@ -45,7 +49,6 @@ func (h *handler) ScrapeJobs() {
 					log.Printf("[ERROR] Error upsert job in GithubJob %+v: %s", job, err)
 					continue
 				}
-				fmt.Printf("%+v\n", job)
 			}
 		}
 	}

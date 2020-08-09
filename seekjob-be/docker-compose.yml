@@ -25,6 +25,9 @@ services:
       POSTGRES_PASSWORD: secret
     ports:
       - 5432:5432
+    volumes:
+      # https://stackoverflow.com/questions/33309121/using-docker-compose-to-create-tables-in-postgresql-database
+      - ./database/migrations/setup.sql:/docker-entrypoint-initdb.d/setup.sql
   adminer:
     image: adminer:latest
     restart: on-failure

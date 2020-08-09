@@ -33,9 +33,15 @@ func NewTheMuseScraperHandler(
 }
 
 func (h *handler) ScrapeJobs() {
-	for _, category := range utils.THE_MUSE_JOBS_CATEGORIES {
+	// TODO: Use go routine
+	categories, err := utils.GetCategories("THEMUSE")
+	if err != nil {
+		log.Println(err)
+	}
+
+	for _, category := range categories {
 		// Scrape at most 500 pages
-		for page := 1; page < 2; page++ {
+		for page := 1; page < 500; page++ {
 			jobs, err := h.getJobs(category, page)
 			if err != nil {
 				log.Println(err)

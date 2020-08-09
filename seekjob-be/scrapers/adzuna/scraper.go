@@ -33,8 +33,17 @@ func NewAdzunaScraperHandler(
 
 func (h *handler) ScrapeJobs() {
 	// TODO: Use go routine
-	for country := range utils.ADZUNA_COUNTRIES_CODE_MAP {
-		for category := range utils.ADZUNA_CATEGORIES {
+	countries, err := utils.GetCountries("ADZUNA")
+	if err != nil {
+		log.Println(err)
+	}
+	categories, err := utils.GetCategories("ADZUNA")
+	if err != nil {
+		log.Println(err)
+	}
+
+	for _, country := range countries {
+		for _, category := range categories {
 			// Scrape at most 100 pages
 			for page := 1; page < 100; page++ {
 				jobs, err := h.getJobs(category, country, page)
@@ -92,7 +101,7 @@ func (h *handler) adzunaJobAdapter(rawJob adzunaResult, location string) models.
 		Company:     rawJob.Company.Name,
 		Description: rawJob.Descripton,
 		Category:    rawJob.Category.Label,
-		Country:     utils.COUNTRIES_STRING_MAP[utils.ADZUNA_COUNTRIES_CODE_MAP[location]],
+		Country:     rawJob.Country.List[0], // Adzuna API locations' first-index show the country
 		Type:        rawJob.Type,
 		PostedAt:    rawJob.PostedAt.Unix(),
 		Source:      "ADZ",

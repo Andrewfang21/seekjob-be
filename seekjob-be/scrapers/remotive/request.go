@@ -32,7 +32,7 @@ func (r *remotiveRequest) callEndpoint(method string) ([]byte, error) {
 	path := utils.ConstructUrlPath(API_BASE_URL, "remote-jobs")
 	params := map[string]string{"category": r.category}
 
-	url := utils.ConstructRequestUrl(path, params)
+	url := utils.ConstructRequestURL(path, params)
 	req, err := http.NewRequest(method, url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("[ERROR] Error creating NewRequest: %s", err)

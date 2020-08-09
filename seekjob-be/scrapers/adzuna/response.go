@@ -17,6 +17,9 @@ type adzunaResult struct {
 	Category struct {
 		Label string `json:"label"`
 	} `json:"category"`
+	Country struct {
+		List []string `json:"area"`
+	} `json:"location"`
 	PostedAt *time.Time `json:"created"`
 	URL      string     `json:"redirect_url"`
 }

@@ -1,15 +1,15 @@
 package database
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"seekjob/config"
 
-	"github.com/jinzhu/gorm"
 	_ "github.com/lib/pq"
 )
 
-var singletonHandler *gorm.DB
+var singletonHandler *sql.DB
 
 func init() {
 	postgresCfg := config.Config.PostgresCfg
@@ -20,17 +20,16 @@ func init() {
 		postgresCfg.DbName,
 		postgresCfg.SSLMode,
 	)
-	db, err := gorm.Open("postgres", postgresString)
+	db, err := sql.Open("postgres", postgresString)
 	if err != nil {
 		log.Fatalf("[ERROR] Fatal error connecting database: %s", err)
 		return
 	}
 
-	db.LogMode(true)
 	singletonHandler = db
 }
 
 // GetHandler returns the handler of the database
-func GetHandler() *gorm.DB {
+func GetHandler() *sql.DB {
 	return singletonHandler
 }

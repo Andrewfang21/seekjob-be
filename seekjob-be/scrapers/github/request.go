@@ -41,7 +41,7 @@ func (g *githubJobsRequest) callEndpoint(method string) ([]byte, error) {
 		"page":     pageInString,
 	}
 
-	url := utils.ConstructRequestUrl(path, params)
+	url := utils.ConstructRequestURL(path, params)
 	req, err := http.NewRequest(method, url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("[ERROR] Error creating NewRequest: %s", err)

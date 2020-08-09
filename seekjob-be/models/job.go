@@ -1,21 +1,21 @@
 package models
 
 import (
-	"github.com/jinzhu/gorm"
+	"database/sql"
 )
 
 // Job model
 type Job struct {
-	ID          string `json:"id" gorm:"column:id"`
-	URL         string `json:"url" gorm:"column:url"`
-	Title       string `json:"title" gorm:"column:title"`
-	Company     string `json:"company" gorm:"column:company"`
-	Description string `json:"description" gorm:"column:description"`
-	Category    string `json:"category" gorm:"column:category"`
-	Country     string `json:"country" gorm:"column:country"`
-	Type        string `json:"type" gorm:"column:type"`
-	PostedAt    int64  `json:"time" gorm:"column:time"`
-	Source      string `json:"source" gorm:"column:source"`
+	ID          string `json:"id"`
+	URL         string `json:"url"`
+	Title       string `json:"title"`
+	Company     string `json:"company"`
+	Description string `json:"description"`
+	Category    string `json:"category"`
+	Country     string `json:"country"`
+	Type        string `json:"type"`
+	PostedAt    int64  `json:"time"`
+	Source      string `json:"source"`
 }
 
 // JobOrmer defines the operations of jobOrmer
@@ -28,11 +28,11 @@ type JobOrmer interface {
 }
 
 type jobOrmer struct {
-	ormer *gorm.DB
+	ormer *sql.DB
 }
 
 // NewJobOrmer returns an instance of jobOrmer
-func NewJobOrmer(ormer *gorm.DB) JobOrmer {
+func NewJobOrmer(ormer *sql.DB) JobOrmer {
 	return &jobOrmer{ormer: ormer}
 }
 

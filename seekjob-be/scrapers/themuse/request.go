@@ -48,7 +48,7 @@ func (t *themuseRequest) callEndpoint(method string) ([]byte, error) {
 		"page":     currentPage,
 	}
 
-	url := utils.ConstructRequestUrl(path, params)
+	url := utils.ConstructRequestURL(path, params)
 	req, err := http.NewRequest(method, url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("[ERROR] Error creating NewRequest: %s", err)
