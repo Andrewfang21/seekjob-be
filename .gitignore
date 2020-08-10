@@ -1,0 +1,7 @@
+# API Key and Environment variables
+*.yaml
+
+# Build File
+seekjob
+
+*.txt
