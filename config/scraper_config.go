@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/spf13/viper"
@@ -42,7 +41,6 @@ type TheMuseScraperCfg struct {
 func init() {
 	configName := "scraper_config"
 	viper.SetConfigName(configName)
-	// viper.AddConfigPath(getAppBasePath())
 	viper.AddConfigPath(".")
 
 	if err := viper.ReadInConfig(); err != nil {
@@ -54,6 +52,4 @@ func init() {
 		log.Fatalf("[ERROR] Fatal error unmarshal scraper config: %s", err)
 		return
 	}
-
-	fmt.Println("HEllo here")
 }

@@ -41,11 +41,7 @@ func init() {
 
 	configName := fmt.Sprintf("app.%s", environment)
 	viper.SetConfigName(configName)
-	// viper.AddConfigPath(getAppBasePath())
-	basePath := getAppBasePath()
-	fmt.Println(basePath)
-	viper.AddConfigPath(basePath)
-	// viper.AddConfigPath(".")
+	viper.AddConfigPath(getAppBasePath())
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatalf("[ERROR] Fatal error config file: %s", err)

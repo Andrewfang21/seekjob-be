@@ -9,7 +9,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var SingletonHandler *sql.DB
+var singletonHandler *sql.DB
 
 func init() {
 	postgresCfg := config.Config.PostgresCfg
@@ -26,11 +26,10 @@ func init() {
 		return
 	}
 
-	fmt.Println("database connection is up")
-	SingletonHandler = db
+	singletonHandler = db
 }
 
 // GetHandler returns the handler of the database
 func GetHandler() *sql.DB {
-	return SingletonHandler
+	return singletonHandler
 }

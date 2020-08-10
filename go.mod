@@ -3,6 +3,7 @@ module seekjob
 go 1.13
 
 require (
+	github.com/getlantern/deepcopy v0.0.0-20160317154340-7f45deb8130a
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.3.0 // indirect
 	github.com/go-redis/redis v6.15.8+incompatible

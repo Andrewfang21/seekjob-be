@@ -9,8 +9,7 @@ import (
 )
 
 func setUpDatabase(t *testing.T, tablesToTruncate ...string) *sql.DB {
-	// ormer := database.GetHandler()
-	ormer := database.SingletonHandler
+	ormer := database.GetHandler()
 
 	truncateQuery := fmt.Sprintf("TRUNCATE TABLE %s CASCADE;", strings.Join(tablesToTruncate, ", "))
 	_, err := ormer.Exec(truncateQuery)
