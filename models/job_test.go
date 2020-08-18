@@ -256,6 +256,143 @@ func TestJob(t *testing.T) {
 			})
 		})
 
+		Convey("GetSources()", func() {
+			Convey("Should return the correct sources", func() {
+				sources := []string{"ADZ", "GIT", "ADZ", "REM", "REE", "THM", "THM"}
+
+				keys := make(map[string]bool)
+				distinctSources := []string{}
+				for _, source := range sources {
+					if _, ok := keys[source]; !ok {
+						distinctSources = append(distinctSources, source)
+						keys[source] = true
+					}
+				}
+
+				for idx, source := range sources {
+					item := &models.Job{
+						ID:          strconv.Itoa(idx),
+						URL:         "www.google.com",
+						Title:       "Software Engineering Intern",
+						Category:    "Engineering",
+						Company:     "Google",
+						Country:     "USA",
+						Description: "Internship",
+						PostedAt:    time.Now().Unix(),
+						Source:      source,
+						Type:        "Internship",
+					}
+					insertQueryCmd(item)
+				}
+
+				sources, err := j.GetSources()
+				So(err, ShouldBeNil)
+				So(sources, ShouldHaveLength, len(distinctSources))
+			})
+		})
+
+		Convey("GetCategories()", func() {
+			Convey("Should return the correct rows", func() {
+				sources := []string{"GIT", "ADZ", "REE", "THM"}
+				categories := []string{"Accounting", "Engineering", "Marketing"}
+				itemCounts := 100
+
+				for i := 0; i < itemCounts; i++ {
+					item := &models.Job{
+						ID:          strconv.Itoa(i),
+						URL:         mockJobItem.URL,
+						Title:       mockJobItem.Title,
+						Category:    categories[i%len(categories)],
+						Company:     mockJobItem.Company,
+						Country:     mockJobItem.Country,
+						Description: mockJobItem.Description,
+						PostedAt:    mockJobItem.PostedAt,
+						Source:      sources[i%len(sources)],
+						Type:        mockJobItem.Type,
+					}
+					insertQueryCmd(item)
+				}
+
+				expectedResult := make(map[string][]*models.JobInfo)
+				expectedResult["GIT"] = []*models.JobInfo{
+					{Name: "Accounting", Total: 9},
+					{Name: "Engineering", Total: 8},
+					{Name: "Marketing", Total: 8},
+				}
+				expectedResult["ADZ"] = []*models.JobInfo{
+					{Name: "Accounting", Total: 8},
+					{Name: "Engineering", Total: 9},
+					{Name: "Marketing", Total: 8},
+				}
+				expectedResult["REE"] = []*models.JobInfo{
+					{Name: "Accounting", Total: 8},
+					{Name: "Engineering", Total: 8},
+					{Name: "Marketing", Total: 9},
+				}
+				expectedResult["THM"] = []*models.JobInfo{
+					{Name: "Accounting", Total: 9},
+					{Name: "Engineering", Total: 8},
+					{Name: "Marketing", Total: 8},
+				}
+
+				for _, source := range sources {
+					results, err := j.GetCategories(source)
+					So(err, ShouldBeNil)
+					So(results, ShouldResemble, expectedResult[source])
+				}
+			})
+		})
+
+		Convey("GetCountries()", func() {
+			Convey("Should return the correct rows", func() {
+				sources := []string{"GIT", "ADZ", "REE"}
+				countries := []string{"AUS", "IDN", "SGP", "USA"}
+				itemCounts := 100
+
+				for i := 0; i < itemCounts; i++ {
+					item := &models.Job{
+						ID:          strconv.Itoa(i),
+						URL:         mockJobItem.URL,
+						Title:       mockJobItem.Title,
+						Category:    mockJobItem.Category,
+						Company:     mockJobItem.Company,
+						Country:     countries[i%len(countries)],
+						Description: mockJobItem.Description,
+						PostedAt:    mockJobItem.PostedAt,
+						Source:      sources[i%len(sources)],
+						Type:        mockJobItem.Type,
+					}
+					insertQueryCmd(item)
+				}
+
+				expectedResult := make(map[string][]*models.JobInfo)
+				expectedResult["GIT"] = []*models.JobInfo{
+					{Name: "Australia", Total: 9},
+					{Name: "Indonesia", Total: 8},
+					{Name: "Singapore", Total: 8},
+					{Name: "United States of America", Total: 9},
+				}
+				expectedResult["ADZ"] = []*models.JobInfo{
+					{Name: "Australia", Total: 8},
+					{Name: "Indonesia", Total: 9},
+					{Name: "Singapore", Total: 8},
+					{Name: "United States of America", Total: 8},
+				}
+				expectedResult["REE"] = []*models.JobInfo{
+					{Name: "Australia", Total: 8},
+					{Name: "Indonesia", Total: 8},
+					{Name: "Singapore", Total: 9},
+					{Name: "United States of America", Total: 8},
+				}
+
+				for _, source := range sources {
+					results, err := j.GetCountries(source)
+					So(err, ShouldBeNil)
+					So(results, ShouldResemble, expectedResult[source])
+				}
+			})
+		})
+
 		Convey("Upsert()", func() {
 			otherMockItem := &models.Job{
 				ID:          mockJobItem.ID,

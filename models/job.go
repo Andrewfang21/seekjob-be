@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"seekjob/utils"
 )
 
 // Job model
@@ -155,19 +156,71 @@ func (j *jobOrmer) GetSources() ([]string, error) {
 }
 
 func (j *jobOrmer) GetCategories(source string) ([]*JobInfo, error) {
-	// queryString := `
-	// 	SELECT x
-	// `
-	return nil, nil
+	queryString := `
+		SELECT
+			DISTINCT(category), COUNT(*)
+		FROM jobs
+		WHERE source = $1
+		GROUP BY category
+		ORDER BY category
+	`
+	queryResult, err := j.ormer.Query(queryString, source)
+	if err != nil {
+		return nil, err
+	}
+	defer queryResult.Close()
+
+	var categories []*JobInfo
+	for queryResult.Next() {
+		var category JobInfo
+		err = queryResult.Scan(
+			&category.Name,
+			&category.Total,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		categories = append(categories, &category)
+	}
+
+	return categories, nil
 }
 
 func (j *jobOrmer) GetCountries(source string) ([]*JobInfo, error) {
-	// queryString := `
-	// 	SELECT DISTINCT(category), COUNT(category)
-	// 	FROM jobs
-	// 	GROUP
-	// `
-	return nil, nil
+	queryString := `
+		SELECT
+			DISTINCT(country), COUNT(*)
+		FROM jobs
+		WHERE source = $1
+		GROUP BY country
+		ORDER BY country
+	`
+	queryResult, err := j.ormer.Query(queryString, source)
+	if err != nil {
+		return nil, err
+	}
+	defer queryResult.Close()
+
+	var countries []*JobInfo
+	for queryResult.Next() {
+		var country JobInfo
+		err = queryResult.Scan(
+			&country.Name,
+			&country.Total,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		country.Name, err = utils.GetCountry(country.Name)
+		if err != nil {
+			return nil, err
+		}
+		countries = append(countries, &country)
+	}
+
+	return countries, nil
 }
 
 func (j *jobOrmer) Upsert(job Job) error {

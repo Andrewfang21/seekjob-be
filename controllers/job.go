@@ -42,7 +42,7 @@ func NewJobController(jobOrmer models.JobOrmer, jobCacheHandler cache.JobHandler
 func (j *jobController) GetJob(id string) (*responses.JobResponse, int, *responses.ErrorResponse) {
 	cache, _ := j.jobCacheHandler.GetJob(id)
 	if cache != nil {
-		return responses.NewJobResponse(models.Job{ID: id}), 200, nil
+		return responses.NewJobResponse(cache), http.StatusOK, nil
 	}
 
 	job, err := j.jobOrmer.Get(id)
@@ -56,7 +56,7 @@ func (j *jobController) GetJob(id string) (*responses.JobResponse, int, *respons
 	expiryDuration := time.Duration(time.Hour * 2)
 	j.jobCacheHandler.SetJob(job, expiryDuration)
 
-	return responses.NewJobResponse(models.Job{ID: id}), 200, nil
+	return responses.NewJobResponse(job), 200, nil
 }
 
 /*
@@ -108,32 +108,31 @@ func (j *jobController) GetJobsStatistics() (*responses.JobStatistics, int, *res
 
 	var statistics []*responses.JobStatistic
 	for _, source := range sources {
-		var statistic responses.JobStatistic
-
+		var categories, countries []*models.JobInfo
 		expiryDuration := time.Duration(time.Hour * 2)
-		statistic.Source = source
 
-		statistic.Categories, _ = j.jobCacheHandler.GetCategories(source)
-		if statistic.Categories == nil {
-			statistic.Categories, err = j.jobOrmer.GetCategories(source)
+		categories, _ = j.jobCacheHandler.GetCategories(source)
+		if categories == nil {
+			categories, err = j.jobOrmer.GetCategories(source)
 			if err != nil {
 				return nil, http.StatusInternalServerError, responses.NewErrorResponse(err.Error())
 			}
 
-			j.jobCacheHandler.SetCategories(source, statistic.Categories, expiryDuration)
+			j.jobCacheHandler.SetCategories(source, categories, expiryDuration)
 		}
 
-		statistic.Countries, _ = j.jobCacheHandler.GetCountries(source)
-		if statistic.Countries == nil {
-			statistic.Countries, err = j.jobOrmer.GetCountries(source)
+		countries, _ = j.jobCacheHandler.GetCountries(source)
+		if countries == nil {
+			countries, err = j.jobOrmer.GetCountries(source)
 			if err != nil {
 				return nil, http.StatusInternalServerError, responses.NewErrorResponse(err.Error())
 			}
 
-			j.jobCacheHandler.SetCountries(source, statistic.Countries, expiryDuration)
+			j.jobCacheHandler.SetCountries(source, countries, expiryDuration)
 		}
 
-		statistics = append(statistics, &statistic)
+		statistic := responses.NewJobStatistic(source, categories, countries)
+		statistics = append(statistics, statistic)
 	}
 
 	return responses.NewJobStatistics(statistics), http.StatusOK, nil

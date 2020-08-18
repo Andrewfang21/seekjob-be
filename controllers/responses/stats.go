@@ -14,6 +14,16 @@ type JobStatistic struct {
 	Countries  []*models.JobInfo `json:"countries"`
 }
 
+// NewJobStatistic returns JobStatistic model
+func NewJobStatistic(source string, categories, countries []*models.JobInfo) *JobStatistic {
+	return &JobStatistic{
+		Source:     source,
+		Categories: categories,
+		Countries:  countries,
+	}
+}
+
+// NewJobStatistics returns JobStatistics model
 func NewJobStatistics(statistics []*JobStatistic) *JobStatistics {
 	return &JobStatistics{Results: statistics}
 }
