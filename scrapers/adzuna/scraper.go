@@ -78,7 +78,7 @@ func (h *handler) getJobs(category, country string, currentPage int) ([]models.J
 	res := &adzunaResponse{}
 	err = json.Unmarshal(body, res)
 	if err != nil {
-		return nil, fmt.Errorf("[ERROR] Error unmarshal body: %s", err)
+		return nil, fmt.Errorf("[ERROR] Error unmarshal Adzuna body: %s", err)
 	}
 
 	var jobs []models.Job

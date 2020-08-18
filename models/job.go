@@ -18,10 +18,19 @@ type Job struct {
 	Source      string `json:"source"`
 }
 
+// JobInfo model
+type JobInfo struct {
+	Name  string `json:"name"`
+	Total int    `json:"job_count"`
+}
+
 // JobOrmer defines the operations of jobOrmer
 type JobOrmer interface {
 	Get(id string) (*Job, error)
 	GetAll(query, category, country, source string, offset, limit int) ([]*Job, error)
+	GetSources() ([]string, error)
+	GetCountries(source string) ([]*JobInfo, error)
+	GetCategories(source string) ([]*JobInfo, error)
 	Upsert(job Job) error
 }
 
@@ -76,7 +85,7 @@ func (j *jobOrmer) GetAll(query, category, country, source string, offset, limit
 	queryString := `
 		SELECT * FROM jobs
 		WHERE
-			description ILIKE $1 AND
+			(description ILIKE $1 OR title ILIKE $1) AND
 			category ILIKE $2 AND
 			country ILIKE $3 AND
 			source ILIKE $4
@@ -120,6 +129,45 @@ func (j *jobOrmer) GetAll(query, category, country, source string, offset, limit
 		jobs = append(jobs, &job)
 	}
 	return jobs, err
+}
+
+func (j *jobOrmer) GetSources() ([]string, error) {
+	queryString := `
+		SELECT DISTINCT(source) from jobs
+	`
+	queryResult, err := j.ormer.Query(queryString)
+	if err != nil {
+		return nil, err
+	}
+	defer queryResult.Close()
+
+	var sources []string
+	for queryResult.Next() {
+		var source string
+		err = queryResult.Scan(&source)
+		if err != nil {
+			return nil, err
+		}
+
+		sources = append(sources, source)
+	}
+	return sources, nil
+}
+
+func (j *jobOrmer) GetCategories(source string) ([]*JobInfo, error) {
+	// queryString := `
+	// 	SELECT x
+	// `
+	return nil, nil
+}
+
+func (j *jobOrmer) GetCountries(source string) ([]*JobInfo, error) {
+	// queryString := `
+	// 	SELECT DISTINCT(category), COUNT(category)
+	// 	FROM jobs
+	// 	GROUP
+	// `
+	return nil, nil
 }
 
 func (j *jobOrmer) Upsert(job Job) error {

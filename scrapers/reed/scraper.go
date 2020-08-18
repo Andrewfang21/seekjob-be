@@ -75,7 +75,7 @@ func (h *handler) ScrapeJobs() {
 }
 
 func (h *handler) getJobs(country, category string, offset int) ([]models.Job, error) {
-	r := newReedRequest(h.reedScraperCfg.ApiKey, country, category, offset)
+	r := newReedRequest(h.reedScraperCfg.APIKey, country, category, offset)
 	body, err := r.callEndpoint("GET")
 	if err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func (h *handler) getJobs(country, category string, offset int) ([]models.Job, e
 	resp := &reedResponse{}
 	err = json.Unmarshal(body, resp)
 	if err != nil {
-		return nil, fmt.Errorf("[ERROR] Error unmarshal body: %s", err)
+		return nil, fmt.Errorf("[ERROR] Error unmarshal Reed body: %s", err)
 	}
 
 	var jobs []models.Job

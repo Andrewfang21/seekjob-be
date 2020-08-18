@@ -1,11 +1,13 @@
 package controllers
 
 import (
+	"net/http"
 	"reflect"
 	"seekjob/cache"
 	"seekjob/controllers/requests"
 	"seekjob/controllers/responses"
 	"seekjob/models"
+	"time"
 
 	"github.com/mitchellh/mapstructure"
 )
@@ -14,7 +16,7 @@ import (
 type JobController interface {
 	GetJob(id string) (*responses.JobResponse, int, *responses.ErrorResponse)
 	GetJobs(params requests.JobRequest) (*responses.JobsResponse, int, *responses.ErrorResponse)
-	GetJobsStatistics() (*responses.JobStatistic, int, *responses.ErrorResponse)
+	GetJobsStatistics() (*responses.JobStatistics, int, *responses.ErrorResponse)
 }
 
 type jobController struct {
@@ -32,16 +34,34 @@ func NewJobController(jobOrmer models.JobOrmer, jobCacheHandler cache.JobHandler
 
 /*
 	Method: [GET]
+	Headers: -
 	Route: /api/jobs/id/:id
 	Params: -
 	Returns job with specified ID
 */
 func (j *jobController) GetJob(id string) (*responses.JobResponse, int, *responses.ErrorResponse) {
+	cache, _ := j.jobCacheHandler.GetJob(id)
+	if cache != nil {
+		return responses.NewJobResponse(models.Job{ID: id}), 200, nil
+	}
+
+	job, err := j.jobOrmer.Get(id)
+	if err != nil {
+		return nil, http.StatusInternalServerError, responses.NewErrorResponse(err.Error())
+	}
+	if job == nil {
+		return nil, http.StatusNoContent, responses.NewErrorResponse("Job with the corresponding ID is not found")
+	}
+
+	expiryDuration := time.Duration(time.Hour * 2)
+	j.jobCacheHandler.SetJob(job, expiryDuration)
+
 	return responses.NewJobResponse(models.Job{ID: id}), 200, nil
 }
 
 /*
 	Method: [GET]
+	Headers: -
 	Route: /api/jobs
 	Params: @required page_no `int`
 			@required per_page `int`
@@ -53,17 +73,70 @@ func (j *jobController) GetJob(id string) (*responses.JobResponse, int, *respons
 */
 func (j *jobController) GetJobs(params requests.JobRequest) (*responses.JobsResponse, int, *responses.ErrorResponse) {
 	params = assignDefaultParams(params)
-	return nil, 200, nil
+
+	offset := (params.PageNo - 1) * params.PerPage
+	jobs, err := j.jobOrmer.GetAll(
+		params.Query,
+		params.Category,
+		params.Country,
+		params.Source,
+		offset,
+		params.PerPage,
+	)
+	if err != nil {
+		return nil, http.StatusInternalServerError, responses.NewErrorResponse(err.Error())
+	}
+	if jobs == nil {
+		return nil, http.StatusNoContent, responses.NewErrorResponse("Jobs not found")
+	}
+
+	return responses.NewJobsResponse(jobs), http.StatusOK, nil
 }
 
 /*
 	Method: [GET]
+	Headers: -
 	Route: /api/jobs/stats
 	Params: -
 	Returns list of jobs grouped by categories and the job counts
 */
-func (j *jobController) GetJobsStatistics() (*responses.JobStatistic, int, *responses.ErrorResponse) {
-	return nil, 200, nil
+func (j *jobController) GetJobsStatistics() (*responses.JobStatistics, int, *responses.ErrorResponse) {
+	sources, err := j.jobOrmer.GetSources()
+	if err != nil {
+		return nil, http.StatusInternalServerError, responses.NewErrorResponse(err.Error())
+	}
+
+	var statistics []*responses.JobStatistic
+	for _, source := range sources {
+		var statistic responses.JobStatistic
+
+		expiryDuration := time.Duration(time.Hour * 2)
+		statistic.Source = source
+
+		statistic.Categories, _ = j.jobCacheHandler.GetCategories(source)
+		if statistic.Categories == nil {
+			statistic.Categories, err = j.jobOrmer.GetCategories(source)
+			if err != nil {
+				return nil, http.StatusInternalServerError, responses.NewErrorResponse(err.Error())
+			}
+
+			j.jobCacheHandler.SetCategories(source, statistic.Categories, expiryDuration)
+		}
+
+		statistic.Countries, _ = j.jobCacheHandler.GetCountries(source)
+		if statistic.Countries == nil {
+			statistic.Countries, err = j.jobOrmer.GetCountries(source)
+			if err != nil {
+				return nil, http.StatusInternalServerError, responses.NewErrorResponse(err.Error())
+			}
+
+			j.jobCacheHandler.SetCountries(source, statistic.Countries, expiryDuration)
+		}
+
+		statistics = append(statistics, &statistic)
+	}
+
+	return responses.NewJobStatistics(statistics), http.StatusOK, nil
 }
 
 func assignDefaultParams(params requests.JobRequest) requests.JobRequest {
@@ -72,8 +145,8 @@ func assignDefaultParams(params requests.JobRequest) requests.JobRequest {
 
 	for k, v := range queries {
 		if reflect.TypeOf(v).Kind() == reflect.String {
-			if v == "" {
-				queries[k] = "%"
+			if v == "" || k == "Query" {
+				queries[k] = "%" + v.(string) + "%"
 			}
 		}
 	}

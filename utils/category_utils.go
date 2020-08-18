@@ -52,20 +52,15 @@ var theMuseCategories = []string{
 // GetCategories returns list of categories according to the source
 func GetCategories(source string) ([]string, error) {
 	list := []string{}
-	switch source {
-	case "ADZUNA":
+	if source == "ADZUNA" {
 		list = append(list, adzunaCategories...)
-		break
-	case "REED":
+	} else if source == "REED" {
 		list = append(list, reedCategories...)
-		break
-	case "REMOTIVE":
+	} else if source == "REMOTIVE" {
 		list = append(list, remotiveCategories...)
-		break
-	case "THEMUSE":
+	} else if source == "THEMUSE" {
 		list = append(list, theMuseCategories...)
-		break
-	default:
+	} else {
 		return nil, fmt.Errorf("Source %s does not exist", source)
 	}
 	return list, nil

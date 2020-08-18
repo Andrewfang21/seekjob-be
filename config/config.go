@@ -9,12 +9,19 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Config is the project's config
 var Config config
 var environment string = "dev"
 
 type config struct {
+	CorsCfg     corsCfg     `mapstructure:"cors"`
 	PostgresCfg postgresCfg `mapstructure:"postgres"`
 	RedisCfg    redisCfg    `mapstructure:"redis"`
+}
+
+type corsCfg struct {
+	AllowedMethods []string `mapstructure:"methods"`
+	AllowedOrigins []string `mapstructure:"origins"`
 }
 
 type postgresCfg struct {
@@ -57,9 +64,7 @@ func init() {
 func getAppBasePath() string {
 	basePath, _ := filepath.Abs(".")
 	for filepath.Base(basePath) != "seekjob" {
-		// fmt.Println("still searching... -> " + filepath.Base(basePath))
 		basePath = filepath.Dir(basePath)
 	}
-	// fmt.Println("basepath = " + basePath)
 	return basePath
 }

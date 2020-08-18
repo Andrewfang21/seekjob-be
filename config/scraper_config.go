@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// ScraperCfg exports the scraper config
 var ScraperCfg scraperConfig
 
 type scraperConfig struct {
@@ -17,25 +18,31 @@ type scraperConfig struct {
 	TheMuse    TheMuseScraperCfg    `mapstructure:"themuse"`
 }
 
+// AdzunaScraperCfg is Adzuna API Config
 type AdzunaScraperCfg struct {
 	ApplicationID  string `mapstructure:"app_id"`
 	ApplicationKey string `mapstructure:"app_key"`
 }
 
+// GithubJobsScraperCfg is GithubJobs API Config
 type GithubJobsScraperCfg struct{}
 
+// JoobleScraperCfg is Jooble API Config
 type JoobleScraperCfg struct {
-	ApiKey string `mapstructure:"api_key"`
+	APIKey string `mapstructure:"api_key"`
 }
 
+// ReedScraperCfg is Reed API Config
 type ReedScraperCfg struct {
-	ApiKey string `mapstructure:"api_key"`
+	APIKey string `mapstructure:"api_key"`
 }
 
+// RemotiveScraperCfg is Remotive API Config
 type RemotiveScraperCfg struct{}
 
+// TheMuseScraperCfg is TheMuse API Config
 type TheMuseScraperCfg struct {
-	ApiKey string `mapstructure:"api_key"`
+	APIKey string `mapstructure:"api_key"`
 }
 
 func init() {

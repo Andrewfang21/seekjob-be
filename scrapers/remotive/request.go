@@ -11,7 +11,6 @@ const API_BASE_URL = "https://remotive.io/api"
 
 type remotiveRequestable interface {
 	callEndpoint(method string) ([]byte, error)
-	constructRequestHeaders(req *http.Request)
 }
 
 type remotiveRequest struct {
@@ -37,7 +36,6 @@ func (r *remotiveRequest) callEndpoint(method string) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("[ERROR] Error creating NewRequest: %s", err)
 	}
-	r.constructRequestHeaders(req)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -54,8 +52,4 @@ func (r *remotiveRequest) callEndpoint(method string) ([]byte, error) {
 	}
 
 	return body, nil
-}
-
-func (r *remotiveRequest) constructRequestHeaders(req *http.Request) {
-	req.Header.Set("Content-Type", "application/json")
 }

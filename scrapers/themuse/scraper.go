@@ -64,7 +64,7 @@ func (h *handler) ScrapeJobs() {
 }
 
 func (h *handler) getJobs(category string, currentPage int) ([]models.Job, error) {
-	r := newTheMuseRequest(h.theMuseScraperCfg.ApiKey, category, currentPage)
+	r := newTheMuseRequest(h.theMuseScraperCfg.APIKey, category, currentPage)
 	body, err := r.callEndpoint("GET")
 	if err != nil {
 		return nil, err
@@ -73,7 +73,7 @@ func (h *handler) getJobs(category string, currentPage int) ([]models.Job, error
 	resp := &theMuseResponse{}
 	err = json.Unmarshal(body, resp)
 	if err != nil {
-		return nil, fmt.Errorf("[ERROR] Error unmarshal body: %s", err)
+		return nil, fmt.Errorf("[ERROR] Error unmarshal TheMuse body: %s", err)
 	}
 
 	var jobs []models.Job

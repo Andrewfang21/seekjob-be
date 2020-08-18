@@ -1,16 +1,19 @@
 package responses
 
+import "seekjob/models"
+
+// JobStatistics model
+type JobStatistics struct {
+	Results []*JobStatistic `json:"results"`
+}
+
 // JobStatistic model
 type JobStatistic struct {
-	Results []struct {
-		Source     string `json:"source"`
-		Categories []struct {
-			Name  string `json:"name"`
-			Total int    `json:"job_count"`
-		} `json:"categories"`
-		Countries []struct {
-			Name  string `json:"name"`
-			Total int    `json:"job_count"`
-		} `json:"countries"`
-	} `json:"results"`
+	Source     string            `json:"source"`
+	Categories []*models.JobInfo `json:"categories"`
+	Countries  []*models.JobInfo `json:"countries"`
+}
+
+func NewJobStatistics(statistics []*JobStatistic) *JobStatistics {
+	return &JobStatistics{Results: statistics}
 }

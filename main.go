@@ -24,7 +24,6 @@ import (
 )
 
 func main() {
-	fmt.Println("pas di bawah main")
 	r := gin.New()
 	r.Use(
 		gin.Logger(),
@@ -55,11 +54,8 @@ func main() {
 	// c.AddFunc("@every 0h0m2s", scraper.ScrapeJobs)
 	// c.Start()
 	scraper.ScrapeJobs()
-	fmt.Println("before router")
 
 	configureRouters(r, jobController)
-
-	fmt.Println("after router")
 
 	port := fmt.Sprintf(":%s", os.Getenv("PORT"))
 	if err := r.Run(port); err != nil {

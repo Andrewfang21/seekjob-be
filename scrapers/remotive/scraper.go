@@ -63,7 +63,7 @@ func (h *handler) getJobsByCategory(category string) ([]models.Job, error) {
 	results := &remotiveResponse{}
 	err = json.Unmarshal(body, results)
 	if err != nil {
-		return nil, fmt.Errorf("[ERROR] Error unmarshal body: %s", err)
+		return nil, fmt.Errorf("[ERROR] Error unmarshal Remotive body: %s", err)
 	}
 
 	var jobs []models.Job

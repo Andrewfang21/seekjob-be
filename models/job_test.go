@@ -146,7 +146,7 @@ func TestJob(t *testing.T) {
 				}
 			})
 
-			Convey("When given the description substring | Should return the correct rows", func() {
+			Convey("When given query string | Should return the correct rows", func() {
 				insertMockItems()
 
 				category := mockJobItem.Category
@@ -155,25 +155,19 @@ func TestJob(t *testing.T) {
 				offset := 0
 				limit := 20
 
-				query := "%ntern%"
-				results, err := j.GetAll(query, category, country, source, offset, limit)
-				So(err, ShouldBeNil)
-				So(results, ShouldHaveLength, limit)
+				queries := []string{"%ntern%", "%inte%", "%SHIP%", "%software%"}
+				for _, query := range queries {
+					results, err := j.GetAll(query, category, country, source, offset, limit)
+					So(err, ShouldBeNil)
+					So(results, ShouldHaveLength, limit)
+				}
 
-				query = "inte%"
-				results, err = j.GetAll(query, category, country, source, offset, limit)
-				So(err, ShouldBeNil)
-				So(results, ShouldHaveLength, limit)
-
-				query = "%SHIP"
-				results, err = j.GetAll(query, category, country, source, offset, limit)
-				So(err, ShouldBeNil)
-				So(results, ShouldHaveLength, limit)
-
-				query = "qwertyuiop"
-				results, err = j.GetAll(query, category, country, source, offset, limit)
-				So(err, ShouldBeNil)
-				So(results, ShouldBeEmpty)
+				queries = []string{"%qwertyuiop%", "%hardware%"}
+				for _, query := range queries {
+					results, err := j.GetAll(query, category, country, source, offset, limit)
+					So(err, ShouldBeNil)
+					So(results, ShouldBeEmpty)
+				}
 			})
 
 			Convey("When given country | Should return the correct rows", func() {
@@ -185,20 +179,19 @@ func TestJob(t *testing.T) {
 				offset := 0
 				limit := 10
 
-				country := "usa"
-				results, err := j.GetAll(query, category, country, source, offset, limit)
-				So(err, ShouldBeNil)
-				So(results, ShouldHaveLength, limit)
+				countries := []string{"%usa%", "%UsA%", "%US%"}
+				for _, country := range countries {
+					results, err := j.GetAll(query, category, country, source, offset, limit)
+					So(err, ShouldBeNil)
+					So(results, ShouldHaveLength, limit)
+				}
 
-				country = "uSA"
-				results, err = j.GetAll(query, category, country, source, offset, limit)
-				So(err, ShouldBeNil)
-				So(results, ShouldHaveLength, limit)
-
-				country = "IDN"
-				results, err = j.GetAll(query, category, country, source, offset, limit)
-				So(err, ShouldBeNil)
-				So(results, ShouldHaveLength, 0)
+				countries = []string{"%IDN%", "%SGP%"}
+				for _, country := range countries {
+					results, err := j.GetAll(query, category, country, source, offset, limit)
+					So(err, ShouldBeNil)
+					So(results, ShouldBeEmpty)
+				}
 			})
 
 			Convey("When given category | Should return the correct rows", func() {
@@ -210,20 +203,19 @@ func TestJob(t *testing.T) {
 				offset := 0
 				limit := 10
 
-				category := "ENGINEERING"
-				results, err := j.GetAll(query, category, country, source, offset, limit)
-				So(err, ShouldBeNil)
-				So(results, ShouldHaveLength, limit)
+				categories := []string{"ENGINEERING", "engineering"}
+				for _, category := range categories {
+					results, err := j.GetAll(query, category, country, source, offset, limit)
+					So(err, ShouldBeNil)
+					So(results, ShouldHaveLength, limit)
+				}
 
-				category = "engineering"
-				results, err = j.GetAll(query, category, country, source, offset, limit)
-				So(err, ShouldBeNil)
-				So(results, ShouldHaveLength, limit)
-
-				category = "Marketing"
-				results, err = j.GetAll(query, category, country, source, offset, limit)
-				So(err, ShouldBeNil)
-				So(results, ShouldHaveLength, 0)
+				categories = []string{"MARKETING", "Finance", "Accounting"}
+				for _, category := range categories {
+					results, err := j.GetAll(query, category, country, source, offset, limit)
+					So(err, ShouldBeNil)
+					So(results, ShouldBeEmpty)
+				}
 			})
 
 			Convey("When given source | Should return the correct rows", func() {
@@ -235,20 +227,19 @@ func TestJob(t *testing.T) {
 				offset := 0
 				limit := 10
 
-				source := "GIT"
-				results, err := j.GetAll(query, category, country, source, offset, limit)
-				So(err, ShouldBeNil)
-				So(results, ShouldHaveLength, limit)
+				sources := []string{"GIT", "git"}
+				for _, source := range sources {
+					results, err := j.GetAll(query, category, country, source, offset, limit)
+					So(err, ShouldBeNil)
+					So(results, ShouldHaveLength, limit)
+				}
 
-				source = "git"
-				results, err = j.GetAll(query, category, country, source, offset, limit)
-				So(err, ShouldBeNil)
-				So(results, ShouldHaveLength, limit)
-
-				source = "KASKUS"
-				results, err = j.GetAll(query, category, country, source, offset, limit)
-				So(err, ShouldBeNil)
-				So(results, ShouldHaveLength, 0)
+				sources = []string{"Glassdoor", "KASKUS", "CP"}
+				for _, source := range sources {
+					results, err := j.GetAll(query, category, country, source, offset, limit)
+					So(err, ShouldBeNil)
+					So(results, ShouldBeEmpty)
+				}
 			})
 
 			Convey("Should return empty slice when there are no data", func() {
@@ -332,7 +323,7 @@ func TestJob(t *testing.T) {
 				So(results[0], ShouldResemble, otherMockItem)
 			})
 
-			Convey("Should insert multiple distinct rows withour error", func() {
+			Convey("Should insert multiple distinct rows without error", func() {
 				err := j.Upsert(*mockJobItem)
 				So(err, ShouldBeNil)
 

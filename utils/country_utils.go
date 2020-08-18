@@ -31,17 +31,13 @@ var reedCountries = []string{
 // GetCountries return list of string according to the source
 func GetCountries(source string) ([]string, error) {
 	list := []string{}
-	switch source {
-	case "ADZUNA":
+	if source == "ADZUNA" {
 		list = append(list, adzunaCountries...)
-		break
-	case "GITHUB":
+	} else if source == "GITHUB" {
 		list = append(list, githubJobsCountries...)
-		break
-	case "REED":
+	} else if source == "REED" {
 		list = append(list, reedCountries...)
-		break
-	default:
+	} else {
 		return nil, fmt.Errorf("Source %s does not exist", source)
 	}
 	return list, nil
