@@ -52,6 +52,8 @@ func TestJobCache(t *testing.T) {
 				Total: 20,
 			},
 		}
+		mockSource := "GIT"
+		mockDuration := time.Duration(time.Minute * 2)
 		mockError := errors.New("bogus")
 
 		jobsRedisKey := func(ID string) string {
@@ -126,11 +128,11 @@ func TestJobCache(t *testing.T) {
 			Convey("When key does exist | Should return the correct value", func() {
 				redisHandler.
 					EXPECT().
-					Get(countriesRedisKey("GIT"), gomock.Any()).
+					Get(countriesRedisKey(mockSource), gomock.Any()).
 					SetArg(1, mockCountries).
 					Return(true, nil)
 
-				results, err := handler.GetCountries("GIT")
+				results, err := handler.GetCountries(mockSource)
 				So(err, ShouldBeNil)
 				So(results, ShouldResemble, mockCountries)
 			})
@@ -162,32 +164,81 @@ func TestJobCache(t *testing.T) {
 			Convey("When key does exist | Should return the correct value", func() {
 				redisHandler.
 					EXPECT().
-					Get(categoriesRedisKey("GIT"), gomock.Any()).
+					Get(categoriesRedisKey(mockSource), gomock.Any()).
 					SetArg(1, mockCategories).
 					Return(true, nil)
 
-				results, err := handler.GetCategories("GIT")
+				results, err := handler.GetCategories(mockSource)
 				So(err, ShouldBeNil)
 				So(results, ShouldResemble, mockCategories)
 			})
 		})
 
 		Convey("SetJob()", func() {
-			Convey("When there is an error in storing value | Should return error", func() {
 
+			Convey("When there is an error in storing value | Should return error", func() {
+				redisHandler.
+					EXPECT().
+					SetWithExpiry(gomock.Any(), gomock.Any(), gomock.Any()).
+					Return(mockError)
+
+				err := handler.SetJob(mockJob, mockDuration)
+				So(err, ShouldEqual, mockError)
 			})
 
 			Convey("When there is no error in storing value | Should return nil", func() {
+				redisHandler.
+					EXPECT().
+					SetWithExpiry(gomock.Any(), gomock.Any(), gomock.Any()).
+					Return(nil)
 
+				err := handler.SetJob(mockJob, mockDuration)
+				So(err, ShouldBeNil)
 			})
 		})
 
 		Convey("SetCountries()", func() {
+			Convey("When there is an error in storing value | Should return error", func() {
+				redisHandler.
+					EXPECT().
+					SetWithExpiry(gomock.Any(), gomock.Any(), gomock.Any()).
+					Return(mockError)
 
+				err := handler.SetCountries(mockSource, mockCountries, mockDuration)
+				So(err, ShouldEqual, mockError)
+			})
+
+			Convey("When there is no error in storing value | Should return nil", func() {
+				redisHandler.
+					EXPECT().
+					SetWithExpiry(gomock.Any(), gomock.Any(), gomock.Any()).
+					Return(nil)
+
+				err := handler.SetCountries(mockSource, mockCountries, mockDuration)
+				So(err, ShouldBeNil)
+			})
 		})
 
 		Convey("SetCategories()", func() {
+			Convey("When there is an error in storing value | Should return error", func() {
+				redisHandler.
+					EXPECT().
+					SetWithExpiry(gomock.Any(), gomock.Any(), gomock.Any()).
+					Return(mockError)
 
+				err := handler.SetCategories(mockSource, mockCategories, mockDuration)
+				So(err, ShouldEqual, mockError)
+			})
+
+			Convey("When there is no error in storing value | Should return nil", func() {
+				redisHandler.
+					EXPECT().
+					SetWithExpiry(gomock.Any(), gomock.Any(), gomock.Any()).
+					Return(nil)
+
+				err := handler.SetCategories(mockSource, mockCategories, mockDuration)
+				So(err, ShouldBeNil)
+			})
 		})
 	})
 }
